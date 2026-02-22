@@ -102,7 +102,9 @@ const LandingPage = () => {
             <img
               src="/MP-Map-55.jpg"
               alt="MP Map"
-              className="w-full max-h-[450px] object-contain"
+              fetchpriority="high"
+              decoding="async"
+              className="w-full  object-contain"
             />
 
             {/* 🔥 Small Total District Badge */}

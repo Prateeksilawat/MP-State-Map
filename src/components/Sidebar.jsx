@@ -1,5 +1,6 @@
 const years = [
-  1956, 1972, 1998, 2003, 2008, 2013, 2018, 2023
+  1956, 1972, 1998, 2003, 2008, 2013, 2018
+  //  2023
 ];
 
 const Sidebar = ({ selectedYear, setSelectedYear }) => {

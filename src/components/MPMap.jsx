@@ -9,7 +9,7 @@ const MPMap = ({ selectedYear }) => {
 
   // Load GeoJSON
   useEffect(() => {
-    fetch("/MadhyaPradesh.geojson")
+    fetch("/mp_districts.geojson")
       .then((res) => res.json())
       .then((data) => setGeoData(data))
       .catch((err) => console.error("GeoJSON load error:", err));
@@ -25,20 +25,26 @@ const MPMap = ({ selectedYear }) => {
 
   // Filter districts by selected year
   const filteredDistricts = formationData.districts.filter(
-    (d) => Number(d.creation_year) === Number(selectedYear)
+    (d) => Number(d.creation_year) === Number(selectedYear),
   );
 
+  // console.log("Selected Year:", selectedYear);
+
+  filteredDistricts.forEach((district) => {
+    console.log(
+      "District:",
+      district.name,
+      "| Created In:",
+      district.creation_year,
+    );
+  });
+
   // Normalize helper (removes spaces + lowercase)
-  const normalize = (str) =>
-    str?.toLowerCase().replace(/\s/g, "");
+  const normalize = (str) => str?.toLowerCase().replace(/\s/g, "");
 
   return (
     <div className="flex-1">
-      <MapContainer
-        center={[23.5, 78.5]}
-        zoom={7}
-        className="h-screen w-full"
-      >
+      <MapContainer center={[23.5, 78.5]} zoom={7} className="h-screen w-full">
         {/* Dark Theme Tile */}
         <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
 
@@ -46,23 +52,35 @@ const MPMap = ({ selectedYear }) => {
         <GeoJSON
           data={geoData}
           style={(feature) => {
-            const match = filteredDistricts.find((d) => {
-              const geoName = normalize(feature.properties.NAME_2);
-              const formationName = normalize(d.name);
+            const districtName = feature.properties.dtname;
 
-              return (
-                formationName === geoName ||
-                (geoName === "eastnimar" && formationName === "khandwa") ||
-                (geoName === "westnimar" && formationName === "khargone")
-              );
-            });
+            const normalize = (name) => name?.toLowerCase().trim();
 
+            const exists = formationData.districts.find(
+              (d) =>
+                normalize(d.name) === normalize(districtName) &&
+                d.creation_year <= selectedYear,
+            );
+console.log(
+  "GeoJSON:",
+  districtName,
+  "| Matched:",
+  formationData.districts.find(
+    (d) =>
+      normalize(d.name) === normalize(districtName)
+  )
+);
             return {
-              fillColor: match ? "#f97316" : "#1e293b",
+              fillColor: exists ? "#2563eb" : "#e5e7eb",
               weight: 1,
               color: "white",
-              fillOpacity: match ? 0.8 : 0.2,
+              fillOpacity: 0.7,
             };
+          }}
+          onEachFeature={(feature, layer) => {
+            layer.bindPopup(`
+      <strong>${feature.properties.dtname}</strong>
+    `);
           }}
         />
 
